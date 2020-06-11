@@ -1,0 +1,113 @@
+version: "3.7"
+
+services:
+  format:
+    entrypoint:
+      - "node"
+      - "node_modules/.bin/prettier"
+      - "**/*.*"
+      - "--write"
+    environment:
+      - "NODE_PATH=."
+    image: node:12.16.0-stretch
+    init: true
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/app
+    working_dir: /usr/src/app
+
+  lint:
+    entrypoint:
+      - "node"
+      - "node_modules/.bin/eslint"
+      - "."
+      - "--ext"
+      - ".ejs,.js,.jsx,.mjs"
+      - "--quiet"
+    environment:
+      - "NODE_PATH=."
+    image: node:12.16.0-stretch
+    init: true
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/app
+    working_dir: /usr/src/app
+
+  npm:
+    entrypoint:
+      - "npm"
+    environment:
+      - "NODE_ENV=development"
+      - "NODE_PATH=."
+    image: node:12.16.0-stretch
+    init: true
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/app
+    working_dir: /usr/src/app
+
+  start:
+    build:
+      context: .
+    command:
+      - "node_modules/.bin/nodemon"
+      - "--ignore"
+      - "src/tests/"
+      - "--inspect=0.0.0.0:5${EXPRESS_SERVER_PORT}"
+      - "--require"
+      - "dotenv/config"
+      - "entry.js"
+    environment:
+      - "NODE_PATH=."
+    init: true
+    networks:
+      - default
+      - local-network
+    ports:
+      - target: ${EXPRESS_SERVER_PORT}
+        published: ${EXPRESS_SERVER_PORT}
+        protocol: tcp
+        mode: host
+      - target: 5${EXPRESS_SERVER_PORT}
+        published: 5${EXPRESS_SERVER_PORT}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/app
+
+  test:
+    entrypoint:
+      - "node"
+      - "--inspect=0.0.0.0:5${EXPRESS_SERVER_PORT_JEST}"
+      - "--require"
+      - "dotenv/config"
+      - "node_modules/.bin/jest"
+      - "--ci"
+      - "--verbose"
+    environment:
+      - "NODE_PATH=."
+    image: node:12.16.0-stretch
+    init: true
+    networks:
+      - default
+      - local-network
+    ports:
+      - target: 5${EXPRESS_SERVER_PORT_JEST}
+        published: 5${EXPRESS_SERVER_PORT_JEST}
+        protocol: tcp
+        mode: host
+    volumes:
+      - type: bind
+        source: ./
+        target: /usr/src/app
+    working_dir: /usr/src/app
+
+networks:
+  local-network:
+    driver: bridge
+    external: true

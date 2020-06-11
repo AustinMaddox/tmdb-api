@@ -1,0 +1,16 @@
+/build
+/coverage
+/node_modules
+
+.env*
+.eslintignore
+.gitignore
+.prettierignore
+
+*.bmp
+*.jpg
+*.gif
+*.log
+*.png
+*.svg
+*.tiff

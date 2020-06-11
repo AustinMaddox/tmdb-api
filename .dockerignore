@@ -1,0 +1,15 @@
+/.circleci
+/.vscode
+/coverage
+/nomad
+.dockerignore
+.env
+.env.example
+.eslintrc.json
+.gitignore
+.prettierrc.json
+docker-compose.yml
+Dockerfile
+jest.config.js
+jsconfig.json
+README.md
